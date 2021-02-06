@@ -14,3 +14,21 @@ The workflow will execute the following steps:
 - Taxonomic profiling using MetaPhlAn3
 - Functional profiling using HUMAnN3
 
+# Snakemake Installation
+
+We will be using Snakemake to run our workflow for us. Snakemake is an absolutely amazing workflow language designed for scientific computing. It's especially suited to handling the kinds of data we generate with DNA sequencing -- many independent files, all of which need to undergo the same processing steps.
+
+We'll follow the steps for installing Snakemake [recommended on the website](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html#installation). The only difference is that we'll be installing Snakemake into a new environment dedicated for this metagenomic pipeline, so maybe we'll give it its own name. Here's what I did:
+
+```{bash}
+mamba create -c conda-forge -c bioconda -n quinn_mg snakemake
+```
+
+Now, we can activate this new environment and start programming!
+
+```
+(base) macbook:pkgs jgs286$ conda activate quinn_mg
+(quinn_mg) macbook:pkgs jgs286$ snakemake --version
+5.32.0
+```
+
