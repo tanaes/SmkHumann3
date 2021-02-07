@@ -1,0 +1,7 @@
+samples: samples.txt
+
+trimming:
+  adapter: ACGGATCGATCGATCGATCGAT
+
+params:
+  cutadapt-pe: ""

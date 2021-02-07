@@ -1,0 +1,7 @@
+sample	unit	fq1	fq2
+A	example	test_data/test_reads/S22205_S104_L001_R1_001.fastq.gz	test_data/test_reads/S22205_S104_L001_R2_001.fastq.gz
+B	example	test_data/test_reads/S22207_S103_L001_R1_001.fastq.gz	test_data/test_reads/S22207_S103_L001_R2_001.fastq.gz
+C	example	test_data/test_reads/S22282_S102_L001_R1_001.fastq.gz	test_data/test_reads/S22282_S102_L001_R2_001.fastq.gz
+D	example	test_data/test_reads/S22400_S101_L001_R1_001.fastq.gz	test_data/test_reads/S22400_S101_L001_R2_001.fastq.gz
+E	example	test_data/test_reads/S22401_S100_L001_R1_001.fastq.gz	test_data/test_reads/S22401_S100_L001_R2_001.fastq.gz
+F	example	test_data/test_reads/S22402_S105_L001_R1_001.fastq.gz	test_data/test_reads/S22402_S105_L001_R2_001.fastq.gz

@@ -32,3 +32,19 @@ Now, we can activate this new environment and start programming!
 5.32.0
 ```
 
+# Samples and Units
+
+We will be using a tabular text file to tell Snakemake what are samples are, and any metadata associated with them about which we want it to know. In this case, the main thing is where the reads associated with the sample can be found!
+
+
+Our `samples.txt` file will look something like this:
+
+```
+sample	fq1	fq2
+A		test_data/S22205_S104_L001_R1_001.fastq.gz	test_data/S22205_S104_L001_R2_001.fastq.gz
+B	test_data/S22207_S103_L001_R1_001.fastq.gz	test_data/S22207_S103_L001_R2_001.fastq.gz
+C	test_data/S22282_S102_L001_R1_001.fastq.gz	test_data/S22282_S102_L001_R2_001.fastq.gz
+D	test_data/S22400_S101_L001_R1_001.fastq.gz	test_data/S22400_S101_L001_R2_001.fastq.gz
+E	test_data/S22401_S100_L001_R1_001.fastq.gz	test_data/S22401_S100_L001_R2_001.fastq.gz
+F	test_data/S22402_S105_L001_R1_001.fastq.gz	test_data/S22402_S105_L001_R2_001.fastq.gz
+```
