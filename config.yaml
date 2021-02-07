@@ -8,6 +8,10 @@ host_reference: ref_data/GRCh38_bt2/GCA_000001405.15_GRCh38_full_analysis_set.fn
 params:
   cutadapt-pe: ""
   humann3: ""
+  metaphlan3: ""
+
+metaphlan3:
+  db_loc: ref_data/metaphlan3
 
 humann3:
   db_loc: ref_data/humann3/DEMO

@@ -13,10 +13,6 @@ rule all:
                sample=samples.index,
                read=[1,2]),
         "output/qc/multiqc.html",
-        "output/taxonomy/combined.metaphlan.txt",
-        "output/function/humann2.test",
-        "output/function/chocophlan_dl.done",
-        "output/function/uniref_dl.done",
         expand("output/function/{sample}_genefamilies.tsv",
                sample=samples.index)
 
@@ -27,7 +23,9 @@ rule pre_fastqc_fwd:
                                       'fq1']
     output:
         html="output/qc/fastqc/{sample}.R1.html",
-        zip="output/qc/fastqc/{sample}.R1_fastqc.zip" # the suffix _fastqc.zip is necessary for multiqc to find the file. If not using multiqc, you are free to choose an arbitrary filename
+        zip="output/qc/fastqc/{sample}.R1_fastqc.zip" 
+        # the suffix _fastqc.zip is necessary for multiqc to find the file.
+        # If not using multiqc, you are free to choose an arbitrary filename
     params: ""
     log:
         "output/logs/fastqc/{sample}.R1.log"
@@ -41,7 +39,9 @@ rule pre_fastqc_rev:
                                       'fq2']
     output:
         html="output/qc/fastqc/{sample}.R2.html",
-        zip="output/qc/fastqc/{sample}.R2_fastqc.zip" # the suffix _fastqc.zip is necessary for multiqc to find the file. If not using multiqc, you are free to choose an arbitrary filename
+        zip="output/qc/fastqc/{sample}.R2_fastqc.zip"
+        # the suffix _fastqc.zip is necessary for multiqc to find the file.
+        # If not using multiqc, you are free to choose an arbitrary filename
     params: ""
     log:
         "output/logs/fastqc/{sample}.R2.log"
@@ -52,17 +52,16 @@ rule pre_fastqc_rev:
 rule cutadapt_pe:
     input:
         lambda wildcards: samples.loc[wildcards.sample,
-                  'fq1'],
+                                      'fq1'],
         lambda wildcards: samples.loc[wildcards.sample,
-                  'fq2']
+                                      'fq2']
     output:
         fastq1="output/trimmed/{sample}.1.fastq.gz",
         fastq2="output/trimmed/{sample}.2.fastq.gz",
         qc="output/trimmed/{sample}.qc.txt"
     params:
-        "-a {} {}".format(
-            config["trimming"]["adapter"], config["params"]["cutadapt-pe"]
-        )
+        "-a {} {}".format(config["trimming"]["adapter"],
+                          config["params"]["cutadapt-pe"])
     log:
         "output/logs/cutadapt/{sample}.log"
     wrapper:
@@ -103,25 +102,53 @@ rule host_filter:
         bowtie = "output/logs/bowtie2/sample_{sample}.bowtie.log",
         other = "output/logs/bowtie2/sample_{sample}.other.log"
     shell:
-          """
-          mkdir -p {output.temp_dir}
-          bowtie2 -p {threads} -x {params.ref} --very-sensitive -1 {input.fastq1} -2 {input.fastq2} 2> {log.bowtie}| \
-          samtools view -f 12 -F 256 -b -o {output.temp_dir}/{wildcards.sample}.unsorted.bam 2> {log.other} 
-           
-          samtools sort -T {output.temp_dir}/{wildcards.sample} -@ {threads} -n \
-          -o {output.temp_dir}/{wildcards.sample}.bam {output.temp_dir}/{wildcards.sample}.unsorted.bam 2> {log.other} 
+        """
+        # Make temporary output directory
+        mkdir -p {output.temp_dir}
 
-          bedtools bamtofastq -i {output.temp_dir}/{wildcards.sample}.bam -fq {output.temp_dir}/{wildcards.sample}.R1.trimmed.filtered.fastq -fq2 {output.temp_dir}/{wildcards.sample}.R2.trimmed.filtered.fastq 2> {log.other}
+        # Map reads against reference genome, and separate all read pairs
+        # that map at least once to the reference, even discordantly.
+        bowtie2 -p {threads} -x {params.ref} --very-sensitive \
+          -1 {input.fastq1} -2 {input.fastq2} \
+          2> {log.bowtie} | \
+          samtools view -f 12 -F 256 -b \
+          -o {output.temp_dir}/{wildcards.sample}.unsorted.bam \
+          2> {log.other} 
 
-          pigz -p {threads} -c {output.temp_dir}/{wildcards.sample}.R1.trimmed.filtered.fastq > {output.temp_dir}/{wildcards.sample}.R1.trimmed.filtered.fastq.gz
-          pigz -p {threads} -c {output.temp_dir}/{wildcards.sample}.R2.trimmed.filtered.fastq > {output.temp_dir}/{wildcards.sample}.R2.trimmed.filtered.fastq.gz
+        # Sort the resulting alignment
+        samtools sort -T {output.temp_dir}/{wildcards.sample} \
+          -@ {threads} -n \
+          -o {output.temp_dir}/{wildcards.sample}.bam \
+          {output.temp_dir}/{wildcards.sample}.unsorted.bam \
+          2> {log.other} 
 
-          cp {output.temp_dir}/{wildcards.sample}.R1.trimmed.filtered.fastq.gz {output.fastq1}
-          cp {output.temp_dir}/{wildcards.sample}.R2.trimmed.filtered.fastq.gz {output.fastq2}
-          """
+        # Convert sorted alignment to fastq format
+        bedtools bamtofastq -i {output.temp_dir}/{wildcards.sample}.bam \
+          -fq {output.temp_dir}/{wildcards.sample}.R1.trimmed.filtered.fastq \
+          -fq2 {output.temp_dir}/{wildcards.sample}.R2.trimmed.filtered.fastq \
+          2> {log.other}
+
+        # zip the filtered fastqs
+        pigz -p {threads} \
+          -c {output.temp_dir}/{wildcards.sample}.R1.trimmed.filtered.fastq > \
+          {output.temp_dir}/{wildcards.sample}.R1.trimmed.filtered.fastq.gz
+        pigz -p {threads} \
+          -c {output.temp_dir}/{wildcards.sample}.R2.trimmed.filtered.fastq > \
+          {output.temp_dir}/{wildcards.sample}.R2.trimmed.filtered.fastq.gz
+
+        # copy the filtered fastqs to final location
+        cp {output.temp_dir}/{wildcards.sample}.R1.trimmed.filtered.fastq.gz \
+          {output.fastq1}
+        cp {output.temp_dir}/{wildcards.sample}.R2.trimmed.filtered.fastq.gz \
+          {output.fastq2}
+        """
 
 
 rule multiqc:
+    """
+    Runs MultiQC to aggregate all the information from FastQC, adapter
+    trimming, and host filtering.
+    """
     input:
         lambda wildcards: expand(rules.pre_fastqc_rev.output,
                                  sample=samples.index),
@@ -143,20 +170,32 @@ rule multiqc:
 
 
 rule metaphlan3_setup:
+    """
+    Installs MetaPhlAn3 databases.
+
+    Set desired db location in config.yaml.
+
+    If using a pre-existing database, you should add an empty file in the
+    db directory called 'metaphlan3.done' so Snakemake knows it doesn't need
+    to re-download it.
+    """
     input:
     output:
-        "ref_data/metaphlan/mpa_latest"
+        done=touch(join(config['metaphlan3']['db_loc'],
+              'metaphlan3.done'))
     conda:
         "envs/metaphlan3.yaml"
     log:
         "output/logs/metaphlan3_setup.log"
+    params:
+        db_loc=config['metaphlan3']['db_loc']
     shell:
-        "metaphlan --install --bowtie2db ref_data/metaphlan3"
+        "metaphlan --install --bowtie2db {params.db_loc}"
 
 
 rule metaphlan3:
     input:
-        db="ref_data/metaphlan/mpa_latest",
+        db=rules.metaphlan3_setup.output.done,
         fastq1="output/filtered/{sample}.1.fastq.gz",
         fastq2="output/filtered/{sample}.2.fastq.gz",
     output:
@@ -168,18 +207,26 @@ rule metaphlan3:
         "output/logs/metaphlan/{sample}.metaphlan.log"
     threads:
         config['threads']['metaphlan3']
+    params:
+        db_loc=config['metaphlan3']['db_loc']
     shell:
         """
         metaphlan {input.fastq1},{input.fastq2} \
-          --bowtie2db ref_data/metaphlan \
+          --bowtie2db {params.db_loc} \
           --bowtie2out {output.bowtie2} \
           --nproc {threads} \
           --input_type fastq \
-          -o {output.profile}
+          -o {output.profile} \
+          2> {log}
         """
 
 
 rule combine_metaphlan:
+    """
+    Combines individual sample MetaPhlAn bug lists into a single aggregate
+    file to give to HUMAnN3. This allows you to use the same nucleotide
+    database for all samples. 
+    """
     input:
         expand("output/taxonomy/{sample}.metaphlan.txt",
                sample=samples.index)
@@ -194,29 +241,31 @@ rule combine_metaphlan:
     shell:
         """
         merge_metaphlan_tables.py \
-          {input} > {output}
-        """
-
-rule humann_test:
-    input:
-    output:
-        touch("output/function/humann2.test")
-    conda:
-        "envs/humann3.yaml"
-    shell:
-        """
-        humann_test
+          {input} > {output} 2> {log}
         """
 
 rule humann_setup:
+    """
+    Installs HUMAnN3 databases.
+
+    Set desired db locations in config.yaml.
+
+    If using pre-existing databases, you should add empty files in the
+    db directory called 'chocophlan_dl.done' and 'uniref_dl.done' to let
+    Snakemake know that it doesn't need to download them again.
+    """
     input:
     output:
-        choco_done=touch("output/function/chocophlan_dl.done"),
-        uniref_done=touch("output/function/uniref_dl.done"),
+        choco_done=touch(join(config['humann3']['db_loc'],
+                              "chocophlan_dl.done")),
+        uniref_done=touch(join(config['humann3']['db_loc'],
+                               "uniref_dl.done")),
         choco_db=join(config['humann3']['db_loc'], "chocophlan"),
         uniref_db=join(config['humann3']['db_loc'], "uniref")
     conda:
         "envs/humann3.yaml"
+    log:
+        "output/logs/humann3/humann_setup.log"
     params:
         choco_db=config['humann3']['choco_db'],
         uniref_db=config['humann3']['uniref_db'],
@@ -224,8 +273,10 @@ rule humann_setup:
     shell:
         """
         mkdir -p {params.db_loc}
-        humann_databases --download chocophlan {params.choco_db} {params.db_loc}
-        humann_databases --download uniref {params.uniref_db} {params.db_loc}
+        humann_databases --download chocophlan {params.choco_db} \
+          {params.db_loc} 2> {log}
+        humann_databases --download uniref {params.uniref_db} \
+          {params.db_loc} 2>> {log}
         """
 
 rule humann3:
@@ -242,6 +293,8 @@ rule humann3:
         pathabn="output/function/{sample}_pathabundance.tsv"
     conda:
         "envs/humann3.yaml"
+    log:
+        "output/logs/humann3/{sample}_humann.log"
     params:
         humann3=config['params']['humann3']
     threads:
@@ -261,7 +314,8 @@ rule humann3:
         --output-basename {wildcards.sample} \
         --input {output.temp_dir}/{wildcards.sample}.fastq.gz \
         --output {output.temp_dir} \
-        {params.humann3}
+        {params.humann3} \
+        2> {log}
 
         cp {output.temp_dir}/{wildcards.sample}_genefamilies.tsv {output.genefam}
         cp {output.temp_dir}/{wildcards.sample}_pathcoverage.tsv {output.pathcov}
