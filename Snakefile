@@ -1,4 +1,5 @@
 import pandas as pd
+from os.path import join
 
 configfile: 'config.yaml'
 
@@ -13,7 +14,12 @@ rule all:
                read=[1,2]),
         "output/qc/multiqc.html",
         "output/taxonomy/combined.metaphlan.txt",
-        "output/function/humann2.test"
+        "output/function/humann2.test",
+        "output/function/chocophlan_dl.done",
+        "output/function/uniref_dl.done",
+        expand("output/function/{sample}_genefamilies.tsv",
+               sample=samples.index)
+
 
 rule pre_fastqc_fwd:
     input:
@@ -191,7 +197,6 @@ rule combine_metaphlan:
           {input} > {output}
         """
 
-
 rule humann_test:
     input:
     output:
@@ -202,3 +207,64 @@ rule humann_test:
         """
         humann_test
         """
+
+rule humann_setup:
+    input:
+    output:
+        choco_done=touch("output/function/chocophlan_dl.done"),
+        uniref_done=touch("output/function/uniref_dl.done"),
+        choco_db=join(config['humann3']['db_loc'], "chocophlan"),
+        uniref_db=join(config['humann3']['db_loc'], "uniref")
+    conda:
+        "envs/humann3.yaml"
+    params:
+        choco_db=config['humann3']['choco_db'],
+        uniref_db=config['humann3']['uniref_db'],
+        db_loc=config['humann3']['db_loc']
+    shell:
+        """
+        mkdir -p {params.db_loc}
+        humann_databases --download chocophlan {params.choco_db} {params.db_loc}
+        humann_databases --download uniref {params.uniref_db} {params.db_loc}
+        """
+
+rule humann:
+    input:
+        choco_db=rules.humann_setup.output.choco_db,
+        uniref_db=rules.humann_setup.output.uniref_db,
+        metaphlan=rules.combine_metaphlan.output,
+        fastq1="output/filtered/{sample}.1.fastq.gz",
+        fastq2="output/filtered/{sample}.2.fastq.gz"
+    output:
+        temp_dir=temp(directory("output/function/{sample}_temp")),
+        genefam="output/function/{sample}_genefamilies.tsv",
+        pathcov="output/function/{sample}_pathcoverage.tsv",
+        pathabn="output/function/{sample}_pathabundance.tsv"
+    conda:
+        "envs/humann3.yaml"
+    params:
+        humann3=config['humann3']['params']
+    threads:
+        2
+    shell:
+        """
+        mkdir -p {output.temp_dir}
+
+        cat {input.fastq1} {input.fastq2} > {output.temp_dir}/{wildcards.sample}.fastq.gz
+
+        humann \
+        --threads {threads} \
+        --bypass-prescreen \
+        --taxonomic-profile {input.metaphlan} \
+        --nucleotide-database  {input.choco_db} \
+        --protein-database {input.uniref_db} \
+        --output-basename {wildcards.sample} \
+        --input {output.temp_dir}/{wildcards.sample}.fastq.gz \
+        --output {output.temp_dir} \
+        {params.humann3}
+
+        cp {output.temp_dir}/{wildcards.sample}_genefamilies.tsv {output.genefam}
+        cp {output.temp_dir}/{wildcards.sample}_pathcoverage.tsv {output.pathcov}
+        cp {output.temp_dir}/{wildcards.sample}_pathabundance.tsv {output.pathabn}
+        """
+
