@@ -98,7 +98,7 @@ rule host_filter:
     conda:
         "envs/bowtie2.yaml"
     threads:
-        4
+        config['threads']['host_filter']
     log:
         bowtie = "output/logs/bowtie2/sample_{sample}.bowtie.log",
         other = "output/logs/bowtie2/sample_{sample}.other.log"
@@ -167,7 +167,7 @@ rule metaphlan3:
     log:
         "output/logs/metaphlan/{sample}.metaphlan.log"
     threads:
-        5
+        config['threads']['metaphlan3']
     shell:
         """
         metaphlan {input.fastq1},{input.fastq2} \
@@ -228,7 +228,7 @@ rule humann_setup:
         humann_databases --download uniref {params.uniref_db} {params.db_loc}
         """
 
-rule humann:
+rule humann3:
     input:
         choco_db=rules.humann_setup.output.choco_db,
         uniref_db=rules.humann_setup.output.uniref_db,
@@ -243,9 +243,9 @@ rule humann:
     conda:
         "envs/humann3.yaml"
     params:
-        humann3=config['humann3']['params']
+        humann3=config['params']['humann3']
     threads:
-        2
+        config['threads']['humann3']
     shell:
         """
         mkdir -p {output.temp_dir}
