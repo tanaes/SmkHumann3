@@ -1,0 +1,3 @@
+Sample	total_reads	paired_total	paired_aligned_none	paired_aligned_one	paired_aligned_multi	paired_aligned_discord_one	paired_aligned_mate_none	paired_aligned_mate_one	paired_aligned_mate_multi	overall_alignment_rate	paired_aligned_mate_multi_halved	paired_aligned_mate_none_halved	paired_aligned_mate_one_halved
+sample_A.bowtie	100000	100000	99992	8	0	0	199980	4	0	0.01	0.0	99990.0	2.0
+sample_B.bowtie	100000	100000	99974	19	7	0	199943	3	2	0.03	1.0	99971.5	1.5

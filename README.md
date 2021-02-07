@@ -14,6 +14,9 @@ The workflow will execute the following steps:
 - Taxonomic profiling using MetaPhlAn3
 - Functional profiling using HUMAnN3
 
+![Rule Graph](./assets/rulegraph.png)
+
+
 # Snakemake Installation
 
 We will be using Snakemake to run our workflow for us. Snakemake is an absolutely amazing workflow language designed for scientific computing. It's especially suited to handling the kinds of data we generate with DNA sequencing -- many independent files, all of which need to undergo the same processing steps.
@@ -43,8 +46,5 @@ Our `samples.txt` file will look something like this:
 sample	fq1	fq2
 A		test_data/S22205_S104_L001_R1_001.fastq.gz	test_data/S22205_S104_L001_R2_001.fastq.gz
 B	test_data/S22207_S103_L001_R1_001.fastq.gz	test_data/S22207_S103_L001_R2_001.fastq.gz
-C	test_data/S22282_S102_L001_R1_001.fastq.gz	test_data/S22282_S102_L001_R2_001.fastq.gz
-D	test_data/S22400_S101_L001_R1_001.fastq.gz	test_data/S22400_S101_L001_R2_001.fastq.gz
-E	test_data/S22401_S100_L001_R1_001.fastq.gz	test_data/S22401_S100_L001_R2_001.fastq.gz
-F	test_data/S22402_S105_L001_R1_001.fastq.gz	test_data/S22402_S105_L001_R2_001.fastq.gz
 ```
+
