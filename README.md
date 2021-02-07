@@ -32,7 +32,7 @@ Now, we can activate this new environment and start programming!
 5.32.0
 ```
 
-# Samples and Units
+# Samples
 
 We will be using a tabular text file to tell Snakemake what are samples are, and any metadata associated with them about which we want it to know. In this case, the main thing is where the reads associated with the sample can be found!
 

@@ -11,7 +11,9 @@ rule all:
         expand("output/filtered/{sample}.{read}.fastq.gz",
                sample=samples.index,
                read=[1,2]),
-        "output/qc/multiqc.html"
+        "output/qc/multiqc.html",
+        "output/taxonomy/combined.metaphlan.txt",
+        "output/function/humann2.test"
 
 rule pre_fastqc_fwd:
     input:
@@ -133,3 +135,70 @@ rule multiqc:
     wrapper:
         "0.70.0/bio/multiqc"
 
+
+rule metaphlan3_setup:
+    input:
+    output:
+        "ref_data/metaphlan/mpa_latest"
+    conda:
+        "envs/metaphlan3.yaml"
+    log:
+        "output/logs/metaphlan3_setup.log"
+    shell:
+        "metaphlan --install --bowtie2db ref_data/metaphlan3"
+
+
+rule metaphlan3:
+    input:
+        db="ref_data/metaphlan/mpa_latest",
+        fastq1="output/filtered/{sample}.1.fastq.gz",
+        fastq2="output/filtered/{sample}.2.fastq.gz",
+    output:
+        bowtie2="output/taxonomy/{sample}.metaphlan.bowtie2.bz2",
+        profile="output/taxonomy/{sample}.metaphlan.txt"
+    conda:
+        "envs/metaphlan3.yaml"
+    log:
+        "output/logs/metaphlan/{sample}.metaphlan.log"
+    threads:
+        5
+    shell:
+        """
+        metaphlan {input.fastq1},{input.fastq2} \
+          --bowtie2db ref_data/metaphlan \
+          --bowtie2out {output.bowtie2} \
+          --nproc {threads} \
+          --input_type fastq \
+          -o {output.profile}
+        """
+
+
+rule combine_metaphlan:
+    input:
+        expand("output/taxonomy/{sample}.metaphlan.txt",
+               sample=samples.index)
+    output:
+        "output/taxonomy/combined.metaphlan.txt"
+    conda:
+        "envs/metaphlan3.yaml"
+    log:
+        "output/logs/metaphlan/combined.metaphlan.log"
+    threads:
+        1
+    shell:
+        """
+        merge_metaphlan_tables.py \
+          {input} > {output}
+        """
+
+
+rule humann_test:
+    input:
+    output:
+        touch("output/function/humann2.test")
+    conda:
+        "envs/humann3.yaml"
+    shell:
+        """
+        humann_test
+        """

@@ -1,0 +1,9 @@
+channels:
+  - defaults
+  - bioconda
+  - conda-forge
+dependencies:
+  - python=3.7
+  - bowtie2
+  - pip:
+    - metaphlan
