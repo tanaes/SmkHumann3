@@ -194,6 +194,9 @@ rule metaphlan3_setup:
 
 
 rule metaphlan3:
+    """
+    Runs MetaPhlAn3.
+    """
     input:
         db=rules.metaphlan3_setup.output.done,
         fastq1="output/filtered/{sample}.1.fastq.gz",
@@ -217,7 +220,7 @@ rule metaphlan3:
           --nproc {threads} \
           --input_type fastq \
           -o {output.profile} \
-          2> {log}
+          > {log} 2>&1
         """
 
 
@@ -274,12 +277,15 @@ rule humann_setup:
         """
         mkdir -p {params.db_loc}
         humann_databases --download chocophlan {params.choco_db} \
-          {params.db_loc} 2> {log}
+          {params.db_loc} > {log} 2>&1
         humann_databases --download uniref {params.uniref_db} \
-          {params.db_loc} 2>> {log}
+          {params.db_loc} >> {log} 2>&1
         """
 
 rule humann3:
+    """
+    Runs HUMAnN3. Additional parameters can be set in the 
+    """
     input:
         choco_db=rules.humann_setup.output.choco_db,
         uniref_db=rules.humann_setup.output.uniref_db,
@@ -315,7 +321,7 @@ rule humann3:
         --input {output.temp_dir}/{wildcards.sample}.fastq.gz \
         --output {output.temp_dir} \
         {params.humann3} \
-        2> {log}
+        > {log} 2>&1
 
         cp {output.temp_dir}/{wildcards.sample}_genefamilies.tsv {output.genefam}
         cp {output.temp_dir}/{wildcards.sample}_pathcoverage.tsv {output.pathcov}
