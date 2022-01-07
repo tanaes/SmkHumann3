@@ -7,7 +7,7 @@ trimming:
 
 # path to bowtie2-formatted index of host genome for read removal.
 # This one is downloaded directly from NCBI.
-host_reference: ref_data/GRCh38_bt2/GCA_000001405.15_GRCh38_full_analysis_set.fna.bowtie_index
+host_reference: /local/workdir/dbs/bowtie2/Mm_GRCm39
 
 # Additional command-line parameters for specific tools
 params:
@@ -17,13 +17,13 @@ params:
 
 # Metaphlan3 DB location
 metaphlan3:
-  db_loc: ref_data/metaphlan3
+  db_loc: /workdir/dbs/metaphlan3
 
 # HUMAnN2 DB location and specifications
 humann3:
-  db_loc: ref_data/humann3/DEMO
-  choco_db: DEMO
-  uniref_db: DEMO_diamond
+  db_loc: /workdir/dbs/biobakery/humann_databases
+  choco_db: /workdir/dbs/biobakery/humann_databases/chocophlan
+  uniref_db: /workdir/dbs/biobakery/humann_databases/uniref
 
 # Thread allocations for specific tools
 threads:
