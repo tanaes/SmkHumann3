@@ -1,0 +1,45 @@
+This is cutadapt 1.13 with Python 3.6.11
+Command line parameters: -a ACGGATCGATCGATCGATCGAT -o output/trimmed/B.1.fastq.gz -p output/trimmed/B.2.fastq.gz test_data/test_reads/S22207_S103_L001_R1_001.fastq.gz test_data/test_reads/S22207_S103_L001_R2_001.fastq.gz
+Trimming 1 adapter with at most 10.0% errors in paired-end legacy mode ...
+Finished in 3.13 s (31 us/read; 1.91 M reads/minute).
+
+=== Summary ===
+
+Total read pairs processed:            100,000
+  Read 1 with adapter:                   1,941 (1.9%)
+  Read 2 with adapter:                       0 (0.0%)
+Pairs written (passing filters):       100,000 (100.0%)
+
+Total basepairs processed:    30,000,000 bp
+  Read 1:    15,000,000 bp
+  Read 2:    15,000,000 bp
+Total written (filtered):     29,993,625 bp (100.0%)
+  Read 1:    14,993,625 bp
+  Read 2:    15,000,000 bp
+
+=== First read: Adapter 1 ===
+
+Sequence: ACGGATCGATCGATCGATCGAT; Type: regular 3'; Length: 22; Trimmed: 1941 times.
+
+No. of allowed errors:
+0-9 bp: 0; 10-19 bp: 1; 20-22 bp: 2
+
+Bases preceding removed adapters:
+  A: 31.9%
+  C: 23.5%
+  G: 23.7%
+  T: 20.8%
+  none/other: 0.0%
+
+Overview of removed sequences
+length	count	expect	max.err	error counts
+3	1526	1562.5	0	1526
+4	326	390.6	0	326
+5	67	97.7	0	67
+6	12	24.4	0	12
+7	5	6.1	0	5
+9	2	0.4	0	0 2
+10	1	0.1	1	0 1
+11	1	0.0	1	0 1
+12	1	0.0	1	0 1
+

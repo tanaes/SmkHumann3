@@ -1,0 +1,7 @@
+Sample	FastQC_mqc-generalstats-fastqc-percent_duplicates	FastQC_mqc-generalstats-fastqc-percent_gc	FastQC_mqc-generalstats-fastqc-avg_sequence_length	FastQC_mqc-generalstats-fastqc-percent_fails	FastQC_mqc-generalstats-fastqc-total_sequences	Cutadapt_mqc-generalstats-cutadapt-percent_trimmed	Bowtie 2 / HiSAT2_mqc-generalstats-bowtie_2_hisat2-overall_alignment_rate
+S22205_S104_L001_R1_001	1.0600000000000023	49.0	150.0	0.0	100000.0		
+S22205_S104_L001_R2_001	0.9279999999999973	50.0	150.0	0.0	100000.0	0.02127	
+S22207_S103_L001_R1_001	1.0829999999999984	47.0	150.0	9.090909090909092	100000.0		
+S22207_S103_L001_R2_001	0.8580000000000041	47.0	150.0	9.090909090909092	100000.0	0.021249999999999998	
+sample_A.bowtie							0.01
+sample_B.bowtie							0.03

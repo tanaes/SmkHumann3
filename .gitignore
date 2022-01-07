@@ -129,6 +129,12 @@ dmypy.json
 .pyre/
 
 
+#### Snakemake
+
+.snakemake/
+output/
+ref_data/
+
 #### OS X stuff
 # https://github.com/github/gitignore/blob/master/Global/macOS.gitignore
 

@@ -1,0 +1,9 @@
+Module	Section	Sample Name	Source
+Bowtie 2 / HiSAT2	all_sections	sample_B.bowtie	/Users/jgs286/Dropbox/Documents/Consulting/Quinn_Lab/Quinn_metagenomics_pipeline/output/logs/bowtie2/sample_B.bowtie.log
+Bowtie 2 / HiSAT2	all_sections	sample_A.bowtie	/Users/jgs286/Dropbox/Documents/Consulting/Quinn_Lab/Quinn_metagenomics_pipeline/output/logs/bowtie2/sample_A.bowtie.log
+Cutadapt	all_sections	S22205_S104_L001_R2_001	/Users/jgs286/Dropbox/Documents/Consulting/Quinn_Lab/Quinn_metagenomics_pipeline/output/trimmed/A.qc.txt
+Cutadapt	all_sections	S22207_S103_L001_R2_001	/Users/jgs286/Dropbox/Documents/Consulting/Quinn_Lab/Quinn_metagenomics_pipeline/output/trimmed/B.qc.txt
+FastQC	all_sections	S22205_S104_L001_R2_001	/Users/jgs286/Dropbox/Documents/Consulting/Quinn_Lab/Quinn_metagenomics_pipeline/output/qc/fastqc/A.R2_fastqc.zip
+FastQC	all_sections	S22207_S103_L001_R2_001	/Users/jgs286/Dropbox/Documents/Consulting/Quinn_Lab/Quinn_metagenomics_pipeline/output/qc/fastqc/B.R2_fastqc.zip
+FastQC	all_sections	S22207_S103_L001_R1_001	/Users/jgs286/Dropbox/Documents/Consulting/Quinn_Lab/Quinn_metagenomics_pipeline/output/qc/fastqc/B.R1_fastqc.zip
+FastQC	all_sections	S22205_S104_L001_R1_001	/Users/jgs286/Dropbox/Documents/Consulting/Quinn_Lab/Quinn_metagenomics_pipeline/output/qc/fastqc/A.R1_fastqc.zip
